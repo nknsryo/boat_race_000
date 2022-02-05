@@ -21,17 +21,19 @@ def todays_date():
     return today_date
 
 
-# def chromedriver_options():
-#     # オプション設定
-#     options = webdriver.ChromeOptions()
-#
-#     options.add_argument('--headless')
-#     options.add_argument("--window-size=1280,1280")
-#     return options
+def chromedriver_options():
+    # オプション設定
+    options = webdriver.ChromeOptions()
 
-# driver = webdriver.Chrome(options=chromedriver_options())
+    options.add_argument('--headless')
+    options.add_argument("--window-size=1280,1280")
+    return options
 
-driver = webdriver.Chrome()
+
+driver = webdriver.Chrome(options=chromedriver_options())
+
+
+# driver = webdriver.Chrome()
 
 
 def main():
