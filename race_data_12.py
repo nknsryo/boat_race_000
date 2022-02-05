@@ -10,6 +10,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 # noinspection PyUnresolvedReferences
 from selenium.webdriver.common.keys import Keys
+import csv
 
 
 def todays_date():

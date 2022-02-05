@@ -10,17 +10,17 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 # noinspection PyUnresolvedReferences
 from selenium.webdriver.common.keys import Keys
-
+import csv
 
 #
-def todays_date():
-    dt_now = datetime.datetime.now()
-    year = dt_now.year
-    month = str(dt_now.month).zfill(2)
-    day = str(dt_now.day).zfill(2)
-    today_date = f"{year}{month}{day}"
-    return today_date
-    pass
+# def todays_date():
+#     dt_now = datetime.datetime.now()
+#     year = dt_now.year
+#     month = str(dt_now.month).zfill(2)
+#     day = str(dt_now.day).zfill(2)
+#     today_date = f"{year}{month}{day}"
+#     return today_date
+#     pass
 
 
 # def chromedriver_options():
@@ -37,25 +37,12 @@ def todays_date():
 
 driver = webdriver.Chrome()
 
-for race_place in range(1, 25):
-    time.sleep(3)
-    race_info = []
-    driver.get(f"https://kyoteibiyori.com/index.php?hiduke={todays_date()}")
-    driver.implicitly_wait(5)
-    x = "中止順延"
-    y = "出走なし"
-    race_place_text = driver.find_element(By.XPATH,
-                                          f"/html/body/div[4]/div/section[1]/div[2]/ul/li[{race_place}]").text
-    stop_race = x in race_place_text
-    none_race = y in race_place_text
-
-    if stop_race:
-        continue
-    elif none_race:
-        continue
-    else:
-        place_name = driver.find_element(By.XPATH,
-                                         f"/html/body/div[4]/div/section[1]/div[2]/ul/li[{race_place}]/a/div[1]").text
-        race_info.append(place_name)
-        print(race_info)
+driver.get("https://kyoteibiyori.com/race_shusso.php?place_no=2&race_no=1&hiduke=20220205&slider=1")
+time.sleep(3)
+text = driver.find_element(By.XPATH,
+                           "/html/body/div[8]/div[1]/section/div[5]/table[1]/tbody/tr[5]/td[2]").text
+student_file = open('test.csv', 'w', newline='')
+writer = csv.writer(student_file)
+writer.writerow(text)
+print(text)
 driver.close()

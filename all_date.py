@@ -10,7 +10,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 # noinspection PyUnresolvedReferences
 from selenium.webdriver.common.keys import Keys
-
+import csv
 
 #
 def todays_date():
@@ -41,7 +41,7 @@ for race_place in range(1, 25):
     time.sleep(3)
     driver.get(f"https://kyoteibiyori.com/index.php?hiduke={todays_date()}")
     driver.implicitly_wait(5)
-    x = "中止順延"
+    x = "中止"
     y = "出走なし"
     race_place_text = driver.find_element(By.XPATH,
                                           f"/html/body/div[4]/div/section[1]/div[2]/ul/li[{race_place}]").text
@@ -98,5 +98,5 @@ for race_place in range(1, 25):
         driver.implicitly_wait(5)
 
         print(race_info)
-        # ここにCSVデータ出力のプログラムを入れる
+
 driver.close()
