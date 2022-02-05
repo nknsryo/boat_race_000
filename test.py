@@ -11,6 +11,7 @@ from selenium.webdriver.common.by import By
 # noinspection PyUnresolvedReferences
 from selenium.webdriver.common.keys import Keys
 
+
 #
 def todays_date():
     dt_now = datetime.datetime.now()
@@ -19,6 +20,7 @@ def todays_date():
     day = str(dt_now.day).zfill(2)
     today_date = f"{year}{month}{day}"
     return today_date
+    pass
 
 
 # def chromedriver_options():
@@ -35,25 +37,25 @@ def todays_date():
 
 driver = webdriver.Chrome()
 
-
-def main():
+for race_place in range(1, 25):
+    time.sleep(3)
     race_info = []
     driver.get(f"https://kyoteibiyori.com/index.php?hiduke={todays_date()}")
-    # race_place_text_1 = driver.find_element(By.XPATH,
-    #                                         "/html/body/div[4]/div/section[1]/div[2]/ul/li[1]").text
-    # race_place_text_2 = driver.find_element(By.XPATH,
-    #                                         "/html/body/div[4]/div/section[1]/div[2]/ul/li[2]").text
-    # print(race_place_text_1)
-    # print(race_place_text_2)
-    # x = "出走なし"
-    # if x in race_place_text:
-    #     pass
-    #     # continue
-    # else:
-    #     place_name = driver.find_element(By.XPATH, f"/html/body/div[4]/div/section[1]/div[2]/ul/"
-    #                                                f"li[{place_number}]/a/div[1]").text
-    #     place_name_button = driver.find_element(By.XPATH, f"/html/body/div[4]/div/section[1]/div[2]/ul/"
-    #                                                       f"li[{place_number}]/a/div[1]")
-    #     race_info.append(place_name)
-    #     print(race_info)
-    driver.close()
+    driver.implicitly_wait(5)
+    x = "中止順延"
+    y = "出走なし"
+    race_place_text = driver.find_element(By.XPATH,
+                                          f"/html/body/div[4]/div/section[1]/div[2]/ul/li[{race_place}]").text
+    stop_race = x in race_place_text
+    none_race = y in race_place_text
+
+    if stop_race:
+        continue
+    elif none_race:
+        continue
+    else:
+        place_name = driver.find_element(By.XPATH,
+                                         f"/html/body/div[4]/div/section[1]/div[2]/ul/li[{race_place}]/a/div[1]").text
+        race_info.append(place_name)
+        print(race_info)
+driver.close()
