@@ -37,12 +37,11 @@ import csv
 
 driver = webdriver.Chrome()
 
-driver.get("https://kyoteibiyori.com/race_shusso.php?place_no=2&race_no=1&hiduke=20220205&slider=1")
+driver.get("https://kyoteibiyori.com/race_shusso.php?place_no=2&race_no=1&hiduke=20220206&slider=1")
 time.sleep(3)
 text = driver.find_element(By.XPATH,
-                           "/html/body/div[8]/div[1]/section/div[5]/table[1]/tbody/tr[5]/td[2]").text
-student_file = open('test.csv', 'w', newline='')
-writer = csv.writer(student_file)
-writer.writerow(text)
-print(text)
+                           "/html/body/div[8]/div[1]/section/div[5]/table[1]/tbody/tr[4]/td[2]").text
+
+text_OK = float(text.split("%")[0])
+print(text_OK)
 driver.close()

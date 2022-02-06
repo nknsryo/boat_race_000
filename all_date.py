@@ -12,6 +12,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 import csv
 
+
 #
 def todays_date():
     dt_now = datetime.datetime.now()
@@ -40,7 +41,7 @@ driver = webdriver.Chrome(options=chromedriver_options())
 for race_place in range(1, 25):
     time.sleep(3)
     driver.get(f"https://kyoteibiyori.com/index.php?hiduke={todays_date()}")
-    driver.implicitly_wait(5)
+    driver.implicitly_wait(20)
     x = "中止"
     y = "出走なし"
     race_place_text = driver.find_element(By.XPATH,
@@ -57,6 +58,7 @@ for race_place in range(1, 25):
                                          f"/html/body/div[4]/div/section[1]/div[2]/ul/li[{race_place}]/a/div[1]").text
     for race_number in range(1, 13):
         race_info = []
+        race_info.append(todays_date())
         race_info.append(place_name)
         time.sleep(2)
         driver.get(f"https://kyoteibiyori.com/race_shusso.php?"
@@ -72,6 +74,7 @@ for race_place in range(1, 25):
             first_win_rate_each = driver.find_element(By.XPATH,
                                                       f"/html/body/div[8]/div[1]/section/div[5]"
                                                       f"/table[1]/tbody/tr[4]/td[{first_win_rate_player + 1}]").text
+            first_win_rate_each = float(first_win_rate_each.split("%")[0])
             race_info.append(first_win_rate_each)
         driver.implicitly_wait(2)
         second_in_rate = driver.find_element(By.XPATH,
@@ -83,6 +86,7 @@ for race_place in range(1, 25):
             second_in_rate_each = driver.find_element(By.XPATH,
                                                       f"/html/body/div[8]/div[1]/section/div[5]"
                                                       f"/table[1]/tbody/tr[9]/td[{second_in_rate_player + 1}]").text
+            second_in_rate_each = float(second_in_rate_each.split("%")[0])
             race_info.append(second_in_rate_each)
 
         determination_way = driver.find_element(By.XPATH,
@@ -93,10 +97,12 @@ for race_place in range(1, 25):
                                                     f"/table[1]/tbody/tr[29]/td[1]").text
         escaped_rate = driver.find_element(By.XPATH, f"/html/body/div[8]/div[1]/section/div[5]"
                                                      f"/table[1]/tbody/tr[29]/td[2]").text
+        escape_rate = float(escape_rate.split("%")[0])
+        escaped_rate = float(escaped_rate.split("%")[0])
         race_info.append(escape_rate)
         race_info.append(escaped_rate)
         driver.implicitly_wait(5)
 
         print(race_info)
 
-driver.close()
+    driver.close()
