@@ -85,20 +85,22 @@ for race_place in range(1, 25):
                                              f"/html/body/div[8]/div[1]/section/div[5]"
                                              f"/table[1]/tbody/tr[6]/td").text
         race_info.append(second_in_rate)
-
+        # 1~6号艇の2連対率
         for second_in_rate_player in range(1, 7):
             second_in_rate_each = driver.find_element(By.XPATH,
                                                       f"/html/body/div[8]/div[1]/section/div[5]"
                                                       f"/table[1]/tbody/tr[9]/td[{second_in_rate_player + 1}]").text
             second_in_rate_each = float(second_in_rate_each.split("%")[0])
             race_info.append(second_in_rate_each)
-
+        # 逃げ率text
         determination_way = driver.find_element(By.XPATH,
                                                 f"/html/body/div[8]/div[1]/section/div[5]"
                                                 f"/table[1]/tbody/tr[26]/td").text
         race_info.append(determination_way)
+        # 逃げ率
         escape_rate = driver.find_element(By.XPATH, f"/html/body/div[8]/div[1]/section/div[5]"
                                                     f"/table[1]/tbody/tr[29]/td[1]").text
+        # 逃し率
         escaped_rate = driver.find_element(By.XPATH, f"/html/body/div[8]/div[1]/section/div[5]"
                                                      f"/table[1]/tbody/tr[29]/td[2]").text
         escape_rate = float(escape_rate.split("%")[0])
