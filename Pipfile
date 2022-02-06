@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 selenium = "*"
 chromedriver-binary-auto = "*"
+psycopg2 = "*"
 
 [dev-packages]
 
