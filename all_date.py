@@ -13,7 +13,6 @@ from selenium.webdriver.common.keys import Keys
 import csv
 
 
-#
 def date():
     dt_now = datetime.datetime.now()
     year = dt_now.year
