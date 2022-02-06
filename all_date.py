@@ -14,7 +14,7 @@ import csv
 
 
 #
-def todays_date():
+def date():
     dt_now = datetime.datetime.now()
     year = dt_now.year
     month = str(dt_now.month).zfill(2)
@@ -41,7 +41,7 @@ driver = webdriver.Chrome(options=chromedriver_options())
 # 24レース場からデータを取得してくる
 for race_place in range(1, 25):
     time.sleep(3)
-    driver.get(f"https://kyoteibiyori.com/index.php?hiduke={todays_date()}")
+    driver.get(f"https://kyoteibiyori.com/index.php?hiduke={date()}")
     driver.implicitly_wait(20)
     x = "中止"
     y = "出走なし"
@@ -58,14 +58,14 @@ for race_place in range(1, 25):
     else:
         place_name = driver.find_element(By.XPATH,
                                          f"/html/body/div[4]/div/section[1]/div[2]/ul/li[{race_place}]/a/div[1]").text
-    # 1~12レースの情報を回す。
+        # 1~12レースの情報を回す。
     for race_number in range(1, 13):
         race_info = []
-        race_info.append(todays_date())
+        race_info.append(date())
         race_info.append(place_name)
         time.sleep(2)
         driver.get(f"https://kyoteibiyori.com/race_shusso.php?"
-                   f"place_no=2&race_no={race_number}&hiduke={todays_date()}&slider=1")
+                   f"place_no=2&race_no={race_number}&hiduke={date()}&slider=1")
         driver.implicitly_wait(5)
         driver.find_element(By.XPATH, "/html/body/div[8]/div[1]/section/div[5]/div[1]/div/ul/li[2]").click()
         driver.implicitly_wait(3)
@@ -111,4 +111,4 @@ for race_place in range(1, 25):
 
         print(race_info)
 
-    driver.close()
+driver.close()
