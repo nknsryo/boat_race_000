@@ -38,6 +38,7 @@ driver = webdriver.Chrome(options=chromedriver_options())
 
 # driver = webdriver.Chrome()
 
+# 24レース場からデータを取得してくる
 for race_place in range(1, 25):
     time.sleep(3)
     driver.get(f"https://kyoteibiyori.com/index.php?hiduke={todays_date()}")
@@ -46,9 +47,10 @@ for race_place in range(1, 25):
     y = "出走なし"
     race_place_text = driver.find_element(By.XPATH,
                                           f"/html/body/div[4]/div/section[1]/div[2]/ul/li[{race_place}]").text
+    # "中止"という文字が入っているかどうか
     stop_race = x in race_place_text
+    # "出走なし"という文字が入っているかどうか
     none_race = y in race_place_text
-
     if stop_race:
         continue
     elif none_race:
@@ -56,6 +58,7 @@ for race_place in range(1, 25):
     else:
         place_name = driver.find_element(By.XPATH,
                                          f"/html/body/div[4]/div/section[1]/div[2]/ul/li[{race_place}]/a/div[1]").text
+    # 1~12レースの情報を回す。
     for race_number in range(1, 13):
         race_info = []
         race_info.append(todays_date())
@@ -70,6 +73,7 @@ for race_place in range(1, 25):
                                              "/html/body/div[8]/div[1]/section/div[5]/table[1]/tbody/tr[1]/td").text
         race_info.append(f"{race_number}R")
         race_info.append(first_win_rate)
+        # 1~6号艇の1着率
         for first_win_rate_player in range(1, 7):
             first_win_rate_each = driver.find_element(By.XPATH,
                                                       f"/html/body/div[8]/div[1]/section/div[5]"
