@@ -91,7 +91,6 @@ def add_data(data, place_name, race_number, first_text, one_3month_1win, two_3mo
 
 def main():
     init_db()
-    add_data()
 
     (data, place_name, race_number, first_text, one_3month_1win, two_3month_1win, three_3month_1win, four_3month_1win,
      five_3month_1win, six_3month_1win, second_text, one_3month_2win, two_3month_2win, three_3month_2win,
@@ -103,7 +102,6 @@ def main():
              four_3month_1win, five_3month_1win, six_3month_1win, second_text, one_3month_2win, two_3month_2win,
              three_3month_2win, four_3month_2win, five_3month_2win, six_3month_2win, kimarite_text, one_6month_escape,
              two_6month_escaped)
-
 
 if __name__ == "__main__":
     main()
