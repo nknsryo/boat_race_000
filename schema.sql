@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS all_race_data(
     one_6month_escape REAL,
     two_6month_escaped REAL
 )
-
+--
 --  テストデータの挿入
 --INSERT INTO
 --    -- customers(name, age)とかにするとカラム指定ができる。
