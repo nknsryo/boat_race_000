@@ -9,6 +9,9 @@ chromedriver-binary-auto = "*"
 psycopg2 = "*"
 python-dotenv = "*"
 schema = "*"
+cx-oracle = "*"
+pandas = "*"
+sqlalchemy = "*"
 
 [dev-packages]
 

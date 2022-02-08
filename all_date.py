@@ -13,6 +13,12 @@ from selenium.webdriver.common.keys import Keys
 # noinspection PyUnresolvedReferences
 import csv
 
+# noinspection PyUnresolvedReferences
+import psycopg2 as psycopg2
+from dotenv import load_dotenv
+
+from db import add_data, init_db
+
 
 def date():
     dt_now = datetime.datetime.now()
@@ -34,9 +40,16 @@ def chromedriver_options():
     pass
 
 
+load_dotenv()
 driver = webdriver.Chrome(options=chromedriver_options())
 
 # driver = webdriver.Chrome()
+
+# test.csvのフォルダ内を空にする
+with open("test.csv", 'r+') as f:
+    f.truncate(0)
+
+init_db()
 
 # 24レース場からデータを取得してくる
 for race_place in range(1, 25):
@@ -105,18 +118,18 @@ for race_place in range(1, 25):
         # 1~6号艇の1着率を取ってくる
         for first_win_rate_player in range(1, 7):
 
-            first_win_rate_each = driver.find_element(By.XPATH,
-                                                      f"/html/body/div[8]/div[1]/section/div[5]"
-                                                      f"/table[1]/tbody/tr[4]/td[{first_win_rate_player + 1}]").text
+            three_month_1win = driver.find_element(By.XPATH,
+                                                   f"/html/body/div[8]/div[1]/section/div[5]"
+                                                   f"/table[1]/tbody/tr[4]/td[{first_win_rate_player + 1}]").text
             # 情報が"-"の時は"0"として表示する
-            if first_win_rate_each == "-":
-                first_win_rate_each = "0.0%1"
+            if three_month_1win == "-":
+                three_month_1win = "0.0%1"
             else:
                 pass
             # %より前に記載してある数字の部分のみを表示してリストに追加
-            first_win_rate_each = first_win_rate_each.split("%")[0]
-            first_win_rate_each = int(first_win_rate_each.split(".")[0])
-            race_info.append(first_win_rate_each)
+            three_month_1win = three_month_1win.split("%")[0]
+            three_month_1win = int(three_month_1win.split(".")[0])
+            race_info.append(three_month_1win)
         driver.implicitly_wait(2)
 
         second_in_rate = driver.find_element(By.XPATH,
@@ -125,18 +138,37 @@ for race_place in range(1, 25):
         race_info.append(second_in_rate)
         # 1~6号艇の2連対率
         for second_in_rate_player in range(1, 7):
-            second_in_rate_each = driver.find_element(By.XPATH,
-                                                      f"/html/body/div[8]/div[1]/section/div[5]"
-                                                      f"/table[1]/tbody/tr[9]/td[{second_in_rate_player + 1}]").text
+            three_month_2win = driver.find_element(By.XPATH,
+                                                   f"/html/body/div[8]/div[1]/section/div[5]"
+                                                   f"/table[1]/tbody/tr[9]/td[{second_in_rate_player + 1}]").text
             # 情報が"-"の時は"0"として表示する
-            if second_in_rate_each == "-":
-                second_in_rate_each = "0.0%1"
+            if three_month_2win == "-":
+                three_month_2win = "0.0%1"
             else:
                 pass
             # %より前に記載してある数字の部分のみを表示してリストに追加
-            second_in_rate_each = second_in_rate_each.split("%")[0]
-            second_in_rate_each = int(second_in_rate_each.split(".")[0])
-            race_info.append(second_in_rate_each)
+            three_month_2win = three_month_2win.split("%")[0]
+            three_month_2win = int(three_month_2win.split(".")[0])
+            race_info.append(three_month_2win)
+
+        third_in_rate = driver.find_element(By.XPATH,
+                                            f"/html/body/div[8]/div[1]/section/div[5]/"
+                                            f"table[1]/tbody/tr[11]/td").text
+        race_info.append(third_in_rate)
+        for third_in_rate_player in range(1, 7):
+            three_month_3win = driver.find_element(By.XPATH,
+                                                   f"/html/body/div[8]/div[1]/section/div[5]/table[1]/tbody/"
+                                                   f"tr[14]/td[{third_in_rate_player + 1}]").text
+            # 情報が"-"の時は"0"として表示する
+            if three_month_3win == "-":
+                three_month_3win = "0.0%1"
+            else:
+                pass
+            # %より前に記載してある数字の部分のみを表示してリストに追加
+            three_month_3win = three_month_3win.split("%")[0]
+            three_month_3win = int(three_month_3win.split(".")[0])
+            race_info.append(three_month_3win)
+
         # "逃げ率"というテキスト情報を取得、追加
         determination_way = driver.find_element(By.XPATH,
                                                 f"/html/body/div[8]/div[1]/section/div[5]"
@@ -157,18 +189,20 @@ for race_place in range(1, 25):
         driver.implicitly_wait(5)
         # test.csvに書き込み
         race_info = tuple(race_info)
+
         with open("test.csv", "a", encoding='utf_8_sig') as csv_file:
             print(race_info, file=csv_file)
         print(race_info)
-
+driver.close()
 # csvファイルの加工
 with open("test.csv", "r", encoding="utf-8_sig") as f:
     s = f.read()
 s = s.replace("'", "")
 s = s.replace("(", "")
 s = s.replace(")", "")
+s = s.replace("[", "")
+s = s.replace("]", "")
 with open("test.csv", "w", encoding="utf-8_sig") as f:
     f.write(s)
-driver.close()
 
 # csvデータをデータベースに反映させる

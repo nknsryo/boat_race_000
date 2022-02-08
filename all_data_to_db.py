@@ -22,8 +22,6 @@ from dotenv import load_dotenv
 
 from db import init_db, add_data
 
-load_dotenv()
-
 
 def date():
     dt_now = datetime.datetime.now()
@@ -122,7 +120,38 @@ for race_place in range(1, 25):
         race_info.append(escaped_rate)
         driver.implicitly_wait(5)
 
-        add_data()
-        print(race_info)
+        race_info = tuple(race_info)
+        # csv_02(1レース分)に書き込み
+        with open("test_02.csv", 'r+') as f:
+            f.truncate(0)
+        with open("test_02.csv", "a", encoding='utf_8_sig') as csv_file:
+            print(race_info, file=csv_file)
+        with open("test_02.csv", "r", encoding="utf-8_sig") as f:
+            s = f.read()
+        s = s.replace("'", "")
+        s = s.replace("(", "")
+        s = s.replace(")", "")
+        s = s.replace("[", "")
+        s = s.replace("]", "")
+        # csv(累計レース)書き込み
+        with open("test_02.csv", "w", encoding="utf-8_sig") as f:
+            f.write(s)
 
-driver.close()
+        add_data()
+
+        with open("test.csv", "a", encoding='utf_8_sig') as csv_file:
+            print(race_info, file=csv_file)
+        print(race_info)
+    driver.close()
+# csvファイルの加工(",","()","[]")削除、更新
+with open("test.csv", "r", encoding="utf-8_sig") as f:
+    s = f.read()
+s = s.replace("'", "")
+s = s.replace("(", "")
+s = s.replace(")", "")
+s = s.replace("[", "")
+s = s.replace("]", "")
+with open("test.csv", "w", encoding="utf-8_sig") as f:
+    f.write(s)
+
+# csvデータをデータベースに反映させる
