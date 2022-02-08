@@ -3,7 +3,7 @@ import os
 import psycopg2 as psycopg2
 from dotenv import load_dotenv
 
-from all_date import race_info
+from all_data_to_db import race_info
 
 load_dotenv()
 
@@ -38,7 +38,8 @@ def init_db():
                                         six_3month_2win REAL,
                                         kimarite_text TEXT,
                                         one_6month_escape REAL,
-                                        two_6month_escaped REAL)
+                                        two_6month_escaped REAL
+                                        )
 
             """
     cursor.execute(sql)
@@ -46,11 +47,7 @@ def init_db():
     connection.close()
 
 
-def add_data(data, place_name, race_number, first_text, one_3month_1win, two_3month_1win, three_3month_1win,
-             four_3month_1win, five_3month_1win, six_3month_1win, second_text, one_3month_2win, two_3month_2win,
-             three_3month_2win, four_3month_2win, five_3month_2win, six_3month_2win, kimarite_text, one_6month_escape,
-             two_6month_escaped):
-    # Connectionを貼る
+def add_data():
     dsn = os.environ.get('DATABASE_URL')
     connection = psycopg2.connect(dsn)
 
@@ -78,9 +75,10 @@ def add_data(data, place_name, race_number, first_text, one_3month_1win, two_3mo
           f"one_6month_escape," \
           f"two_6month_escaped" \
           f")" \
-          f"VALUES (" \
-          f"'20220207', '桐生', '1R', '1着率', 0.0, 15.4, 14.3, 0.0, 0.0, 0.0, " \
-          f"'2連対率', 20.0, 23.1, 35.7, 42.9, 0.0, 0.0, '決まり手', 18.8, 57.1)"
+          f"VALUES ({race_info[0]},{race_info[2]},{race_info[3]},{race_info[4]},{race_info[5]}," \
+          f"{race_info[6]},{race_info[7]},{race_info[8]},{race_info[9]},{race_info[10]}," \
+          f"{race_info[11]},{race_info[12]},{race_info[13]},{race_info[14]},{race_info[15]}," \
+          f"{race_info[16]},{race_info[17]},{race_info[18]},{race_info[19]})"
 
     cursor.execute(sql)
 
@@ -92,56 +90,6 @@ def add_data(data, place_name, race_number, first_text, one_3month_1win, two_3mo
 def main():
     init_db()
 
-    (data, place_name, race_number, first_text, one_3month_1win, two_3month_1win, three_3month_1win, four_3month_1win,
-     five_3month_1win, six_3month_1win, second_text, one_3month_2win, two_3month_2win, three_3month_2win,
-     four_3month_2win, five_3month_2win, six_3month_2win, kimarite_text, one_6month_escape,
-     two_6month_escaped) = ['20220207', '桐生', '1R', '1着率', 0.0, 15.4, 14.3, 0.0, 0.0, 0.0, '2連対率', 20.0, 23.1, 35.7,
-                            42.9, 0.0, 0.0, '決まり手', 18.8, 57.1]
-
-    add_data(data, place_name, race_number, first_text, one_3month_1win, two_3month_1win, three_3month_1win,
-             four_3month_1win, five_3month_1win, six_3month_1win, second_text, one_3month_2win, two_3month_2win,
-             three_3month_2win, four_3month_2win, five_3month_2win, six_3month_2win, kimarite_text, one_6month_escape,
-             two_6month_escaped)
 
 if __name__ == "__main__":
     main()
-
-# def get_connection():
-#     """コネクションを貼る関数"""
-#     dsn = os.environ.get("DATABASE_URL")
-#     return psycopg2.connect(dsn)
-
-
-# def cursor_execute(sql, params=()):
-#     """sqlを実行する関数 select文なら実行結果を返す"""
-#     with get_connection() as conn:
-#         with conn.cursor() as cur:
-#             # cur.execute(sql)
-#             cur.execute(sql, params)
-#             if sql.split(" ")[0] == "SELECT":
-#                 customers = cur.fetchall()
-#                 return customers
-
-
-# def init_db():
-#     """データベースの初期化を行う関数"""
-#     with open('schema.sql', encoding="utf-8") as f:
-#         cursor_execute(f.read())
-
-
-# def get_all_customers():
-#     sql = "SELECT * FROM customers;"
-#     customers = cursor_execute(sql)
-#     return customers
-
-
-# def add_customer(name, age):
-#     sql = "INSERT INTO customers VALUES (%(name)s, %(age)s);"
-#     params = {"name": name, "age": age}
-#     cursor_execute(sql, params)
-
-
-# if __name__ == '__main__':
-#     init_db()
-
-# print(init_db.__doc__)

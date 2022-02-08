@@ -13,6 +13,17 @@ from selenium.webdriver.common.keys import Keys
 # noinspection PyUnresolvedReferences
 import csv
 
+# noinspection PyUnresolvedReferences
+import os
+
+# noinspection PyUnresolvedReferences
+import psycopg2 as psycopg2
+from dotenv import load_dotenv
+
+from db import init_db, add_data
+
+load_dotenv()
+
 
 def date():
     dt_now = datetime.datetime.now()
@@ -38,15 +49,15 @@ driver = webdriver.Chrome(options=chromedriver_options())
 
 # driver = webdriver.Chrome()
 
+init_db()
+
 # 24レース場からデータを取得してくる
 for race_place in range(1, 25):
     time.sleep(3)
-    # ボートレース日和の当日のトップページを表示
     driver.get(f"https://kyoteibiyori.com/index.php?hiduke={date()}")
     driver.implicitly_wait(20)
     x = "中止"
     y = "出走なし"
-    # 開催場名をテキスト情報として取得
     race_place_text = driver.find_element(By.XPATH,
                                           f"/html/body/div[4]/div/section[1]/div[2]/ul/li[{race_place}]").text
     # "中止"という文字が入っているかどうか
@@ -54,71 +65,35 @@ for race_place in range(1, 25):
     # "出走なし"という文字が入っているかどうか
     none_race = y in race_place_text
     if stop_race:
-        # "中止"という文字が入っていたら処理をとばす
         continue
     elif none_race:
-        # "出走なし"という文字が入っていたら処理をとばす
         continue
     else:
-        # それ以外の条件の時に情報を取得できるようにする
         place_name = driver.find_element(By.XPATH,
                                          f"/html/body/div[4]/div/section[1]/div[2]/ul/li[{race_place}]/a/div[1]").text
         # 1~12レースの情報を回す。
     for race_number in range(1, 13):
-        # それぞれの開催場の枠別情報のページを表示
-        driver.get(f"https://kyoteibiyori.com/race_shusso.php?"
-                   f"place_no={race_place}&race_no={race_number}&hiduke={date()}&slider=1")
+        race_info = []
+        race_info.append(date())
+        race_info.append(place_name)
         time.sleep(2)
+        driver.get(f"https://kyoteibiyori.com/race_shusso.php?"
+                   f"place_no=2&race_no={race_number}&hiduke={date()}&slider=1")
         driver.implicitly_wait(5)
-        # 一般戦のボタンをクリック
         driver.find_element(By.XPATH, "/html/body/div[8]/div[1]/section/div[5]/div[1]/div/ul/li[2]").click()
         driver.implicitly_wait(3)
-        race_info = []
-        # スタート時間を取得
-        start_time = driver.find_element(By.XPATH, F"/html/body/div[8]/div[1]/section/div[3]/h2").text
-        start_time = start_time.split("締切")[1]
-        start_time = start_time.split(" ")[0]
-        start_time = start_time.split("\n")[0]
-        # リストに　日付　を追加
-        race_info.append(date())
-        # リストに　開催場　を追加
-        race_info.append(place_name)
-        # リストに　出走時間　を追加
-        race_info.append(start_time)
-        # "1着率"という文字情報を取得
         first_win_rate = driver.find_element(By.XPATH,
                                              "/html/body/div[8]/div[1]/section/div[5]/table[1]/tbody/tr[1]/td").text
-        # リストに　レース番号　を追加
         race_info.append(f"{race_number}R")
-        # リストに選手名を追加
-        for player_name in range(1, 7):
-            players_name = driver.find_element(By.XPATH,
-                                               f"/html/body/div[8]/div[1]/section/div[3]/div[2]/table/tbody/"
-                                               f"tr[3]/td[{player_name}]").text
-            players_name_1 = players_name.split("\n")[0]
-            players_name_2 = players_name.split("\n")[1]
-            players_name = f"{players_name_1} {players_name_2}"
-            race_info.append(players_name)
-
-        # リストに　"1着率"　という文字を追加
         race_info.append(first_win_rate)
-        # 1~6号艇の1着率を取ってくる
+        # 1~6号艇の1着率
         for first_win_rate_player in range(1, 7):
-
             first_win_rate_each = driver.find_element(By.XPATH,
                                                       f"/html/body/div[8]/div[1]/section/div[5]"
                                                       f"/table[1]/tbody/tr[4]/td[{first_win_rate_player + 1}]").text
-            # 情報が"-"の時は"0"として表示する
-            if first_win_rate_each == "-":
-                first_win_rate_each = "0.0%1"
-            else:
-                pass
-            # %より前に記載してある数字の部分のみを表示してリストに追加
-            first_win_rate_each = first_win_rate_each.split("%")[0]
-            first_win_rate_each = int(first_win_rate_each.split(".")[0])
+            first_win_rate_each = float(first_win_rate_each.split("%")[0])
             race_info.append(first_win_rate_each)
         driver.implicitly_wait(2)
-
         second_in_rate = driver.find_element(By.XPATH,
                                              f"/html/body/div[8]/div[1]/section/div[5]"
                                              f"/table[1]/tbody/tr[6]/td").text
@@ -128,47 +103,26 @@ for race_place in range(1, 25):
             second_in_rate_each = driver.find_element(By.XPATH,
                                                       f"/html/body/div[8]/div[1]/section/div[5]"
                                                       f"/table[1]/tbody/tr[9]/td[{second_in_rate_player + 1}]").text
-            # 情報が"-"の時は"0"として表示する
-            if second_in_rate_each == "-":
-                second_in_rate_each = "0.0%1"
-            else:
-                pass
-            # %より前に記載してある数字の部分のみを表示してリストに追加
-            second_in_rate_each = second_in_rate_each.split("%")[0]
-            second_in_rate_each = int(second_in_rate_each.split(".")[0])
+            second_in_rate_each = float(second_in_rate_each.split("%")[0])
             race_info.append(second_in_rate_each)
-        # "逃げ率"というテキスト情報を取得、追加
+        # 逃げ率text
         determination_way = driver.find_element(By.XPATH,
                                                 f"/html/body/div[8]/div[1]/section/div[5]"
                                                 f"/table[1]/tbody/tr[26]/td").text
         race_info.append(determination_way)
-        # 逃げ率　を取得、リストに追加していく
+        # 逃げ率
         escape_rate = driver.find_element(By.XPATH, f"/html/body/div[8]/div[1]/section/div[5]"
                                                     f"/table[1]/tbody/tr[29]/td[1]").text
-        # 逃し率　を取得、リストに追加していく
+        # 逃し率
         escaped_rate = driver.find_element(By.XPATH, f"/html/body/div[8]/div[1]/section/div[5]"
                                                      f"/table[1]/tbody/tr[29]/td[2]").text
-        escape_rate = escape_rate.split("%")[0]
-        escape_rate = int(escape_rate.split(".")[0])
-        escaped_rate = escaped_rate.split("%")[0]
-        escaped_rate = int(escaped_rate.split(".")[0])
+        escape_rate = float(escape_rate.split("%")[0])
+        escaped_rate = float(escaped_rate.split("%")[0])
         race_info.append(escape_rate)
         race_info.append(escaped_rate)
         driver.implicitly_wait(5)
-        # test.csvに書き込み
-        race_info = tuple(race_info)
-        with open("test.csv", "a", encoding='utf_8_sig') as csv_file:
-            print(race_info, file=csv_file)
+
+        add_data()
         print(race_info)
 
-# csvファイルの加工
-with open("test.csv", "r", encoding="utf-8_sig") as f:
-    s = f.read()
-s = s.replace("'", "")
-s = s.replace("(", "")
-s = s.replace(")", "")
-with open("test.csv", "w", encoding="utf-8_sig") as f:
-    f.write(s)
 driver.close()
-
-# csvデータをデータベースに反映させる
