@@ -43,9 +43,9 @@ def chromedriver_options():
     pass
 
 
-driver = webdriver.Chrome(options=chromedriver_options())
+# driver = webdriver.Chrome(options=chromedriver_options())
 
-# driver = webdriver.Chrome()
+driver = webdriver.Chrome()
 
 init_db()
 
@@ -76,7 +76,7 @@ for race_place in range(1, 25):
         race_info.append(place_name)
         time.sleep(2)
         driver.get(f"https://kyoteibiyori.com/race_shusso.php?"
-                   f"place_no=2&race_no={race_number}&hiduke={date()}&slider=1")
+                   f"place_no={race_place}&race_no={race_number}&hiduke={date()}&slider=1")
         driver.implicitly_wait(5)
         driver.find_element(By.XPATH, "/html/body/div[8]/div[1]/section/div[5]/div[1]/div/ul/li[2]").click()
         driver.implicitly_wait(3)
@@ -103,6 +103,24 @@ for race_place in range(1, 25):
                                                       f"/table[1]/tbody/tr[9]/td[{second_in_rate_player + 1}]").text
             second_in_rate_each = float(second_in_rate_each.split("%")[0])
             race_info.append(second_in_rate_each)
+        third_in_rate = driver.find_element(By.XPATH,
+                                            f"/html/body/div[8]/div[1]/section/div[5]/"
+                                            f"table[1]/tbody/tr[11]/td").text
+        race_info.append(third_in_rate)
+        for third_in_rate_player in range(1, 7):
+            three_month_3win = driver.find_element(By.XPATH,
+                                                   f"/html/body/div[8]/div[1]/section/div[5]/table[1]/tbody/"
+                                                   f"tr[14]/td[{third_in_rate_player + 1}]").text
+            # 情報が"-"の時は"0"として表示する
+            if three_month_3win == "-":
+                three_month_3win = "0.0%1"
+            else:
+                pass
+            # %より前に記載してある数字の部分のみを表示してリストに追加
+            three_month_3win = three_month_3win.split("%")[0]
+            three_month_3win = int(three_month_3win.split(".")[0])
+            race_info.append(three_month_3win)
+
         # 逃げ率text
         determination_way = driver.find_element(By.XPATH,
                                                 f"/html/body/div[8]/div[1]/section/div[5]"

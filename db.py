@@ -63,7 +63,8 @@ def add_data():
             one_6month_escape = row[25]
             one_6month_escaped = row[26]
 
-            cursor.execute('''INSERT INTO all_race_data (data,place_name,race_number,
+            cursor.execute('''INSERT INTO all_race_data (
+                    data,place_name,race_number,
                     first_text,one_3month_1win,two_3month_1win,three_3month_1win,four_3month_1win,five_3month_1win,six_3month_1win,
                     second_text,oen_3month_2win,two_3month_2win,three_3month_2win,four_3month_2win,five_3month_2win,six_3month_2win,
                     third_text,one_3month_3win,two_3month_3win,three_3month_3win,four_3month_3win,five_3month_3win,six_3month_3win,
